@@ -29,7 +29,7 @@ DASHBOARD_PATH = os.getcwd() + "/files/grafana-dashboards"
 SNAP_NAME = "prometheus-apt-exporter"
 #SVC_NAME = "snap.prometheus-apt-exporter.daemon"
 SVC_NAME = "snap.prometheus-apt-exporter.apt-exporter.service"
-PORT_NUMBER = "9177"
+PORT_NUMBER = "8089"
 LIBVIRTD_APPARMOR_LOCAL_PROFILE = "/etc/apparmor.d/local/usr.sbin.libvirtd"
 
 
@@ -40,8 +40,13 @@ def install_packages():
     hookenv.status_set("maintenance", "Installing software")
     config = hookenv.config()
     channel = config.get("snap_channel")
-    snap.install(SNAP_NAME, channel=channel, force_dangerous=False)
+    #snap.install(SNAP_NAME, channel=channel, force_dangerous=False)
+    subprocess.check_call(["wget", "http://10.5.2.203:8000/prometheus-apt-exporter_0.2.5_amd64.snap"])
+    subprocess.check_call(["snap", "install", "prometheus-apt-exporter_0.2.5_amd64.snap", "--dangerous"])
     subprocess.check_call(["snap", "connect", "prometheus-apt-exporter:apt-exporter-files"])
+
+    # LP#1954934: silence libvirtd ptrace apparmor denials
+    #configure_libvirtd_apparmor_local_profile(LIBVIRTD_APPARMOR_LOCAL_PROFILE)
 
     hookenv.status_set("active", "Exporter installed and connected")
     #TODO
@@ -210,3 +215,29 @@ def update_dashboards_from_resource():
         return
 
     register_grafana_dashboards()
+
+
+#def configure_libvirtd_apparmor_local_profile(libvirtd_apparmor_local_profile):
+#    """Silence libvirtd ptrace apparmor denials from kern.log."""
+#    deny_ptrace_rule = (
+#        "deny ptrace (read) peer=snap.prometheus-libvirt-exporter.daemon,"
+#    )
+#
+#    # if there is no libvirtd installed this is a noop
+#    if not os.path.exists(libvirtd_apparmor_local_profile):
+#        return
+#
+#    # Read current local profile and strip new lines.
+#    current_profile_lines = open(libvirtd_apparmor_local_profile, "r").readlines()
+#    current_profile_lines = list(map(str.strip, current_profile_lines))
+#
+#    # If deny ptrace rule is already there do nothing.
+#    if deny_ptrace_rule in current_profile_lines:
+#        return
+#
+#    # Add ptrace deny rule
+#    open(libvirtd_apparmor_local_profile, "a").write("\n" + deny_ptrace_rule + "\n")
+#
+#    # Reload libvirtd apparmor profile
+#    libvirtd_apparmor_profile = "/etc/apparmor.d/usr.sbin.libvirtd"
+#    subprocess.check_call(["apparmor_parser", "-r", libvirtd_apparmor_profile])

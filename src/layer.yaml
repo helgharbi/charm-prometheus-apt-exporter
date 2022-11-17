@@ -1,0 +1,13 @@
+includes:
+    - layer:basic
+    - interface:http
+    - layer:snap
+    - interface:juju-info
+    - interface:nrpe-external-master
+    - interface:grafana-dashboard
+    - layer:leadership
+ignore: ['.*.swp' ]
+options:
+    basic:
+        use_venv: true
+repo: https://git.launchpad.net/~hicham-el-gharbi/+git/charm-prometheus-apt-exporter
