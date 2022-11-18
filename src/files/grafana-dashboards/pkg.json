@@ -1,8 +1,8 @@
 {
   "__inputs": [
     {
-      "name": "DS_PROMETHEUS2_- JUJU GENERATED SOURCE",
-      "label": "prometheus2 - Juju generated source",
+      "name": "prometheus - Juju generated source",
+      "label": "prometheus - Juju generated source",
       "description": "",
       "type": "datasource",
       "pluginId": "prometheus",
@@ -15,7 +15,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "9.2.4"
+      "version": "9.2.5"
     },
     {
       "type": "datasource",
@@ -34,10 +34,7 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": {
-          "type": "grafana",
-          "uid": "-- Grafana --"
-        },
+        "datasource": "prometheus - Juju generated source",
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -60,10 +57,7 @@
   "liveNow": false,
   "panels": [
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS2_- JUJU GENERATED SOURCE}"
-      },
+      "datasource": "prometheus - Juju generated source",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -137,25 +131,31 @@
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS2_- JUJU GENERATED SOURCE}"
-          },
+          "datasource": "prometheus - Juju generated source",
           "editorMode": "builder",
-          "expr": "pkg_upgradable",
+          "expr": "sum by(dns_name) (pkg_upgradable) != 0",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
       "title": "upgradable packages",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "mode": "reduceRow",
+            "reduce": {
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        }
+      ],
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS2_- JUJU GENERATED SOURCE}"
-      },
+      "datasource": "prometheus - Juju generated source",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -232,26 +232,31 @@
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS2_- JUJU GENERATED SOURCE}"
-          },
+          "datasource": "prometheus - Juju generated source",
           "editorMode": "builder",
-          "expr": "sum(pkg_broken)",
+          "expr": "sum by(dns_name) (pkg_broken) > 0",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
       "title": "broken packages",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "mode": "reduceRow",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        }
+      ],
       "transparent": true,
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS2_- JUJU GENERATED SOURCE}"
-      },
+      "datasource": "prometheus - Juju generated source",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -307,8 +312,8 @@
       "gridPos": {
         "h": 8,
         "w": 12,
-        "x": 0,
-        "y": 8
+        "x": 6,
+        "y": 9
       },
       "id": 4,
       "options": {
@@ -325,110 +330,21 @@
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS2_- JUJU GENERATED SOURCE}"
-          },
+          "datasource": "prometheus - Juju generated source",
           "editorMode": "builder",
-          "expr": "sum(pkg_reboot_required)",
-          "legendFormat": "__auto",
+          "expr": "pkg_reboot_required > 0",
+          "legendFormat": "{{dns_name}}",
           "range": true,
           "refId": "A"
         }
       ],
       "title": "hosts need reboot",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS2_- JUJU GENERATED SOURCE}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 9
-      },
-      "id": 10,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
+      "transformations": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS2_- JUJU GENERATED SOURCE}"
-          },
-          "editorMode": "builder",
-          "expr": "sum(pkg_upgradable)",
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A"
+          "id": "calculateField",
+          "options": {}
         }
       ],
-      "title": "packages upgradable cluster",
       "type": "timeseries"
     }
   ],
@@ -444,8 +360,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "pkg upgradable and broken",
+  "title": "prometheus-apt-exporter",
   "uid": "VaC7rRdVk",
-  "version": 7,
+  "version": 1,
   "weekStart": ""
 }
